@@ -1,12 +1,16 @@
 package main
 
 import (
-    "github.com/gin-gonic/gin"
-    "github.com/sirius2alpha/scoreboard/routers"
+	"log"
+	"net/http"
+	"scoreboard/routers"
 )
 
 func main() {
-    r := gin.Default()
-    routers.SetupRouter(r)
-    r.Run()
+
+	// 路由初始化
+	router := routers.SetupRouter()
+
+	// 启动服务器
+	log.Fatal(http.ListenAndServe(":8080", router))
 }
