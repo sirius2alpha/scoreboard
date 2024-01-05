@@ -47,4 +47,20 @@ backend
 - 在services/redis-server.go中，对各个任务如何具体操作redis进行定义
 
 
+## 运行方式
+
+```
+cd backend
+brew services start redis
+go run main.go
+```
+
+```
+cd ui
+npm install
+npm run dev
+```
+
+
+
 
