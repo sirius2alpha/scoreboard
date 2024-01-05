@@ -5,7 +5,7 @@ import (
 	"log"
 	"scoreboard/services"
 	"time"
-
+	"net/http"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
 )
@@ -15,6 +15,9 @@ import (
 var upgrader = websocket.Upgrader{
 	ReadBufferSize:  1024,
 	WriteBufferSize: 1024,
+	CheckOrigin: func(r *http.Request) bool {
+		return true // 允许所有的跨域请求
+	},
 }
 
 // 记录所有打开的 WebSocket 连接
