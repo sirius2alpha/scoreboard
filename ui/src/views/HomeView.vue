@@ -2,6 +2,7 @@
 import {ref} from 'vue';
 import {useRouter} from 'vue-router';
 import {useUserStore} from '@/stores/user.js';
+
 const nickName = ref('');
 const router = useRouter();
 const setUser = useUserStore().setUser;

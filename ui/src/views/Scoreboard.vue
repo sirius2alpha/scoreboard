@@ -1,8 +1,45 @@
+<script setup>
+import { onMounted, ref } from "vue";
+import { useUserStore } from "@/stores/user.js";
+import { ElMessage } from "element-plus";
+import { useRouter } from "vue-router";
+
+const listData = ref([]);
+const user = useUserStore().user;
+const router = useRouter();
+const sendScore = () => {
+  if (!user) {
+    router.push({
+      path: "/",
+    });
+    return ElMessage.error("请先输入昵称");
+  }
+  const message = {
+    type: "UserClick",
+    nickname: user,
+  };
+  window.$ws.sendMessage(message);
+};
+const goHome = () => {
+    router.push("/");
+  };
+
+onMounted(() => {
+  console.log(window.$ws);
+  window.$ws.onMessage((message) => {
+    listData.value = message;
+  });
+});
+</script>
+
 <template>
   <el-row :gutter="10" class="list-container">
     <el-col :span="4">
       <div class="button-area">
-        <el-button @click="sendScore">点击</el-button>
+        <!-- Return Button -->
+        <el-button @click="goHome">Return</el-button>
+        <!-- Click Button -->
+        <el-button @click="sendScore">Click!</el-button>
       </div>
     </el-col>
     <el-col :span="20">
@@ -17,37 +54,6 @@
     </el-col>
   </el-row>
 </template>
-<script setup>
-import {onMounted, ref} from 'vue';
-import {useUserStore} from '@/stores/user.js';
-import {ElMessage} from 'element-plus';
-import {useRouter} from 'vue-router';
-
-const listData = ref([]);
-const user = useUserStore().user;
-const router = useRouter();
-const sendScore = () => {
-  if (!user) {
-    router.push({
-      path: '/'
-    });
-    return ElMessage.error('请先输入昵称');
-  }
-  ;
-  const message = {
-    'type': 'UserClick',
-    'nickname': user,
-  };
-  window.$ws.sendMessage(message);
-};
-
-onMounted(() => {
-  console.log(window.$ws);
-  window.$ws.onMessage((message) => {
-    listData.value = message;
-  });
-});
-</script>
 <style scoped>
 .button-area {
   width: 100%;
