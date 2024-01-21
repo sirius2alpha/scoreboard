@@ -42,3 +42,5 @@ go.work
 node_modules
 dist
 .vite
+
+main
