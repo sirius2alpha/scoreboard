@@ -19,8 +19,7 @@ Vue Gin Redis
 
 ## 前端
 
-
-
+前端采用vue框架编写完成，UI组件采用elementplus
 
 
 ## 后端
@@ -49,15 +48,24 @@ backend
 
 ## 运行方式
 
+确保redis正常运行
+``` shell
+# 检查 Redis 是否正在运行
+if ! pgrep -x "redis-server" > /dev/null
+then
+    # 如果 Redis 没有运行，就启动它
+    redis-server &
+fi
 ```
+
+``` shell
 cd backend
-brew services start redis
 go run main.go
 ```
 
-```
-cd ui
-npm install
+``` shell
+cd frontend
+npm install # 只需要在第一次运行时执行
 npm run dev
 ```
 

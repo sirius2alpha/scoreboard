@@ -3,9 +3,10 @@ package controllers
 import (
 	"encoding/json"
 	"log"
+	"net/http"
 	"scoreboard/services"
 	"time"
-	"net/http"
+
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
 )
@@ -116,7 +117,7 @@ func HandleWebSocket(c *gin.Context) {
 			// 当消息类型为 "UserInactive" 时，处理用户不活跃逻辑
 			// 从解析后的消息中获取 "nickname" 字段的值，并将其转换为 string 类型
 			// 然后调用 services.HandleUserInactive 函数处理用户不活跃
-			err = services.HandleUserInactive(msg["nickname"])
+			services.HandleUserInactive(msg["nickname"])
 			if err == nil {
 				log.Printf("User inactive: " + msg["nickname"])
 			}
@@ -132,8 +133,13 @@ func init() {
 			// 每隔一分钟执行一次循环体中的代码
 			time.Sleep(200 * time.Millisecond) // 可根据需要调整时间间隔
 
+			// 调用 service.UpdateClickInterval
+			services.UpdateClickInterval()
+			// 调用 services.CheckAllUsers() 函数检查所有用户的活跃状态
+			services.CheckAllUsers()
 			// 调用 services.GetRanking() 函数获取用户排名
 			ranking, err := services.GetRanking()
+
 			// 如果在获取用户排名时发生错误，打印错误信息并跳过本次循环的剩余部分
 			if err != nil {
 				log.Printf("error getting ranking: %v", err)
