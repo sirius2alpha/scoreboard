@@ -1,5 +1,5 @@
 export const initWebsocket = () => {
-    const ws = new WebSocket('ws://localhost:8080/ws');
+    const ws = new WebSocket('ws://1.94.126.139:8080/ws');
     ws.onopen = () => {
         console.log('connected');
     };

@@ -4,7 +4,7 @@ import {ElMessage} from 'element-plus';
 
 export const useWebsocket = defineStore('websocket', () => {
     const data = ref(null);
-    const instance = new WebSocket('ws://localhost:8080/ws');
+    const instance = new WebSocket('ws://1.94.126.139:8080/ws');
 
     const send = (message) => {
         instance.send(JSON.stringify(message));
