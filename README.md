@@ -69,9 +69,51 @@
 
 ## 前端
 
-前端采用vue框架编写完成，UI组件采用elementplus
+```angular2html
+frontend
+├── index.html
+├── jsconfig.json
+├── package-lock.json
+├── package.json
+├── public
+│   └── favicon.ico
+├── src
+│   ├── App.vue
+│   ├── assets
+│   │   ├── base.css
+│   │   ├── logo.svg
+│   │   └── main.css
+│   ├── hooks
+│   │   └── useWebsocket.js
+│   ├── main.js
+│   ├── router
+│   │   └── index.js
+│   ├── stores
+│   │   ├── counter.js
+│   │   ├── user.js
+│   │   └── websocket.js
+│   ├── utils
+│   │   └── websocketInstance.js
+│   └── views
+│       ├── HomeView.vue
+│       └── Scoreboard.vue
+└── vite.config.js
 
+```
+前端采用vue框架编写完成，UI组件采用element plus，大致流程：
 
+- 项目启动： 在 main.js 中创建 Vue 应用实例，并引入所需的插件和组件，比如 Pinia、Vue Router 和 Element Plus
+- 路由配置：在 router/index.js 中定义路由规则，设置 / 和 /board 路由对应的组件为 HomeView.vue 和 Scoreboard.vue
+- WebSocket通信：在 utils/websocketInstance.js 中初始化 WebSocket 连接，并封装相关的通信功能，如发送和接收消息
+- 状态管理：使用 Pinia 创建不同的 stores，如 stores/user.js 管理用户状态，stores/websocket.js 管理 WebSocket 状态和通信
+- 用户界面：HomeView.vue 用于收集用户昵称并通过 WebSocket 将用户加入得分板。
+  Scoreboard.vue 订阅 WebSocket 消息，更新并展示实时得分数据
+- 数据交互：针对不同用户操作（如输入昵称、点击得分）触发相应的 WebSocket 消息发送。
+  接收来自服务器的 WebSocket 消息并更新前端视图
+- 样式渲染：使用 assets 目录下的 CSS 文件定义全局样式。
+  每个 Vue 组件内的 style 标签定义了组件局部样式，确保 UI 的一致性和响应式设计
+- 用户反馈：利用 Element Plus 的消息提示组件 ElMessage 反馈操作结果，如错误提示或确认消息
+- 构建部署：使用 Vite 作为构建和开发服务器，配置文件 vite.config.js 定义了构建参数和优化措施
 
 
 ## 后端
