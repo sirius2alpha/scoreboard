@@ -119,6 +119,7 @@ go run main.go
 
 ``` shell
 cd frontend
+vite build  # 只需要在第一次运行时执行
 npm install # 只需要在第一次运行时执行
 npm run dev
 ```

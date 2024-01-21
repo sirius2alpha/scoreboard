@@ -32,3 +32,13 @@ test/
 # Go workspace file
 go.work
 
+# IDEA
+.idea
+
+# vscode
+.vscode
+
+# vite
+node_modules
+dist
+.vite
