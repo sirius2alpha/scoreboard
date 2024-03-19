@@ -1,5 +1,8 @@
 # scoreboard
 
+项目部署：http://redisboard.sirius1y.top/
+
+
 对于项目更详细的介绍，移步：https://sirius1y.me/posts/notes/dev/dev-%E7%82%B9%E5%87%BB%E6%8E%92%E8%A1%8C%E6%A6%9C/
 
 
