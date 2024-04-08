@@ -45,33 +45,30 @@ func init() {
 	}
 }
 
-// 处理新用户的函数，当有新用户时，将其添加到users中
-func AddNewUser(userID string) {
+// & 处理新用户的函数，当有新用户时，将其添加到users中
+func AddNewUser(user string) {
 	client.ZAdd("users", redis.Z{
-		Score:  0,      // 新用户的点击次数
-		Member: userID, // 新用户的 ID
+		Score:  0,    // 新用户的点击次数
+		Member: user, // 新用户的 nickname
 	})
+	client.HSet("clickTime", user, time.Now().Format("2006-01-02 15:04:05"))
+	client.HSet("clickInterval", user, "0") // 0 需要用字符串
 }
 
-// 处理用户点击的函数，当用户点击时，增加其在users中的点击次数
-func HandleUserClick(userID string) {
-	// 增加用户的点击次数
-	client.ZIncrBy("users", 1, userID)
-
-	// 记录点击时间
-	clickTime := time.Now().Format("2006-01-02 15:04:05") // 获取当前时间，并格式化为字符串
-	client.HSet("clickTime", userID, clickTime)           // 将点击时间存储到 Redis 中
+// & 处理用户点击的函数，当用户点击时，增加其在users中的点击次数
+func HandleUserClick(user string) {
+	client.ZIncrBy("users", 1, user)                                         // 增加用户的点击次数
+	client.HSet("clickTime", user, time.Now().Format("2006-01-02 15:04:05")) // 将点击时间存储到 Redis 中
 }
 
-// 更新用户点击间隔时间的函数
+// & 更新用户点击间隔时间的函数
 func UpdateClickInterval() {
 	// 获取所有用户的 ID
-	userIDs, _ := client.ZRange("users", 0, -1).Result()
-	for _, userID := range userIDs {
-		now := time.Now()
-		lastClickTimeStr, err := client.HGet("clickTime", userID).Result() // 获取用户的上一次点击时间
+	users, _ := client.ZRange("users", 0, -1).Result()
+	for _, user := range users {
+		lastClickTimeStr, err := client.HGet("clickTime", user).Result() // 获取用户的上一次点击时间
 		if err != nil {
-			log.Printf("[Error] Getting last click time for user[%s] failed in UpdateClickInterval(): %v", userID, err)
+			log.Printf("[Error] Getting last click time for user[%s] failed in UpdateClickInterval(): %v", user, err)
 			continue
 		}
 
@@ -80,22 +77,23 @@ func UpdateClickInterval() {
 		// 将上一次点击时间的字符串转换为 time.Time 类型
 		lastClickTime, err := time.ParseInLocation("2006-01-02 15:04:05", lastClickTimeStr, loc)
 		if err != nil {
-			log.Printf("[Error] Parsing last click time for user [%s] failed in UpdateClickInterval(): %v", userID, err)
+			log.Printf("[Error] Parsing last click time for user [%s] failed in UpdateClickInterval(): %v", user, err)
 			continue
 		}
 
 		// 计算时间间隔
+		now := time.Now()
 		clickInterval := now.Sub(lastClickTime).Seconds()
 
 		// 将时间间隔存储到 clickInterval 中
-		client.HSet("clickInterval", userID, strconv.FormatInt(int64(clickInterval), 10))
+		client.HSet("clickInterval", user, strconv.FormatInt(int64(clickInterval), 10))
 	}
 }
 
-// 获取用户点击间隔时间的函数
-func GetClickInterval(userID string) (int64, error) {
+// & 获取用户点击间隔时间的函数
+func GetClickInterval(user string) (int64, error) {
 	// 从 Redis 中获取用户的点击间隔时间
-	clickIntervalStr, err := client.HGet("clickInterval", userID).Result()
+	clickIntervalStr, err := client.HGet("clickInterval", user).Result()
 	if err != nil {
 		return 0, fmt.Errorf("error getting click interval: %v", err)
 	}
@@ -105,10 +103,10 @@ func GetClickInterval(userID string) (int64, error) {
 	return clickInterval, nil
 }
 
-// 获取用户点击时间的函数
-func GetClickTime(userID string) (string, error) {
+// & 获取用户点击时间的函数
+func GetClickTime(user string) (string, error) {
 	// 从 Redis 中获取用户的点击时间
-	clickTime, err := client.HGet("clickTime", userID).Result()
+	clickTime, err := client.HGet("clickTime", user).Result()
 	if err != nil {
 		return "", fmt.Errorf("error getting click time: %v", err)
 	}
@@ -116,7 +114,7 @@ func GetClickTime(userID string) (string, error) {
 	return clickTime, nil
 }
 
-// 从Redis的users中获取点击次数最多的前 ranking_number 个用户
+// & 从Redis的users中获取点击次数最多的前 ranking_number 个用户
 func GetRanking() ([]UserScore, error) {
 	// 读取配置文件
 	viper.AddConfigPath("../../conf/")
@@ -155,29 +153,29 @@ func GetRanking() ([]UserScore, error) {
 	return result, nil
 }
 
-// 检查所有用户的活跃状态，如果用户不活跃，就将其从 users 中删除
+// & 检查所有用户的活跃状态，如果用户不活跃，就将其从 users 中删除
 func CheckAllUsers() {
 	// 获取所有用户的 ID
-	userIDs, _ := client.ZRange("users", 0, -1).Result()
-	for _, userID := range userIDs {
+	users, _ := client.ZRange("users", 0, -1).Result()
+	for _, user := range users {
 		// 对每个用户调用 HandleUserInactive 函数
-		HandleUserInactive(userID)
+		HandleUserInactive(user)
 	}
 }
 
-// 处理不活跃用户的函数，当用户上一次点击间隔时间超过 max_keep_seconds 的时候就删除该用户
-func HandleUserInactive(userID string) {
+// & 处理不活跃用户的函数，当用户上一次点击间隔时间超过 max_keep_seconds 的时候就删除该用户
+func HandleUserInactive(user string) {
 
 	max_keep_seconds := core.AppConfig.GetFloat64("redis.max_keep_seconds")
 
 	// 获取用户的点击间隔时间
-	clickIntervalStr, _ := client.HGet("clickInterval", userID).Result()
+	clickIntervalStr, _ := client.HGet("clickInterval", user).Result()
 
 	// 将点击间隔时间的字符串转换为 float64 类型
 	clickInterval, _ := strconv.ParseFloat(clickIntervalStr, 64)
 
 	// 如果点击间隔时间超过 max_keep_seconds 秒，就从users中删除用户
 	if clickInterval > max_keep_seconds {
-		client.ZRem("users", userID)
+		client.ZRem("users", user)
 	}
 }
