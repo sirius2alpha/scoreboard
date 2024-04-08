@@ -1,0 +1,10 @@
+[redis]
+redis_host = '127.0.0.1'
+max_keep_seconds = 5.0
+ranking_number = 10
+
+[server]
+backend_listen_port=8001
+
+[frontend]
+vite_port=5173
