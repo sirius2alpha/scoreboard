@@ -26,7 +26,6 @@ run:
 	@cd scripts && ./check_port.sh
 	@cd app/frontend && npm run dev & 
 	@echo "frontend started"
-	@cd app/backend
-	go run main.go &
+	@cd app/backend && go run main.go &
 	@echo "backend started"
 	@echo "All services started"
