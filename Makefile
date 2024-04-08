@@ -4,29 +4,35 @@ help:
 	@echo ""
 	@echo "Targets:"
 	@echo "  build     		- Build the application, swagger document will be generated"
+	@echo "  debug		- Run the backend in debug mode"
+	@echo "  deploy		-deploy the application on my site"
 #	@echo "  gen-swagger 		- Generate swagger document"
 	@echo "  run			- Run the frontend and backend"
-	@echo "  deploy		-deploy the application on my site"
 
 .PHONY:	build
 build:
-	cd frontend
-	vite build
+	cd app/frontend 
 	npm install
 
-.PHONY: start-backend start-frontend start
-
-start-backend:
-	@cd scripts && ./check_port.sh
-	@cd src/backend && go run main.go & echo "backend started"
-
-start-frontend:
-	@cd src/frontend && npm install && npm run dev & echo "frontend started"
-
-run: start-backend start-frontend
-	@echo "All services started"
+.PHONY: debug
+debug:
+	@cd app/backend
+	dlv debug ./app/backend/main.go
 
 .PHONY: deploy
 deploy:
-	@cd scripts && ./deploy.sh
+	@cd app/frontend/ && npm run build
+	scp -r dist root@sirius1y.top:/var/www/scoreboard/frontend/
+	@cd app/backend/ && go build -o main
+	scp main root@sirius1y.top:/var/www/scoreboard/backend/
 	@echo "Application deployed"
+
+.PHONY: run
+run:
+	@cd scripts && ./check_port.sh
+	@cd app/frontend && npm run dev & 
+	@echo "frontend started"
+	@cd app/backend
+	go run main.go &
+	@echo "backend started"
+	@echo "All services started"
