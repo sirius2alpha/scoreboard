@@ -4,7 +4,6 @@ help:
 	@echo ""
 	@echo "Targets:"
 	@echo "  build     		- Build the application, swagger document will be generated"
-	@echo "  debug		- Run the backend in debug mode"
 	@echo "  deploy		-deploy the application on my site"
 #	@echo "  gen-swagger 		- Generate swagger document"
 	@echo "  run			- Run the frontend and backend"
@@ -13,11 +12,6 @@ help:
 build:
 	cd app/frontend 
 	npm install
-
-.PHONY: debug
-debug:
-	@cd app/backend
-	dlv debug ./app/backend/main.go
 
 .PHONY: deploy
 deploy:
