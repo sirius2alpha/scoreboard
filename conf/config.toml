@@ -4,7 +4,8 @@ max_keep_seconds = 5.0
 ranking_number = 10
 
 [server]
-backend_listen_port=8001
+backend_listen_port = 8001
 
 [frontend]
-vite_port=5173
+server_host = '127.0.0.1:8001'
+vite_port = 5173

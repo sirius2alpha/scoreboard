@@ -8,7 +8,7 @@ import (
 
 func SetupRouter() *gin.Engine {
 	r := gin.Default()
-	// 定义WebSocket路由
+
 	r.GET("/ws", handlers.HandleWebSocket)
 	r.GET("/config", handlers.ConfigHandler)
 

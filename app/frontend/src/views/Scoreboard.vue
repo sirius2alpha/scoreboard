@@ -4,15 +4,23 @@ import { useUserStore } from "@/stores/user.js";
 import { ElMessage } from "element-plus";
 import { useRouter } from "vue-router";
 import axios from 'axios';
+import process from "process";
 
 const maxKeepSeconds = ref(0);
 const listData = ref([]);
 const user = useUserStore().user;
 const router = useRouter();
 
+const server_host = process.env.VUE_APP_SERVER_HOST;
+
+// & 获取配置信息
 onMounted(async () => {
-  const response = await axios.get('/config');
-  maxKeepSeconds.value = response.data.max_keep_seconds;
+  try {
+    const response = await axios.get(`http://${server_host}/config`);
+    maxKeepSeconds.value = response.data.max_keep_seconds;
+  } catch (error) {
+    console.error(error);
+  }
 
   console.log(window.$ws);
   window.$ws.onMessage((message) => {
@@ -20,6 +28,7 @@ onMounted(async () => {
   });
 });
 
+// & 发送点击事件
 const sendScore = () => {
   if (!user) {
     router.push({
